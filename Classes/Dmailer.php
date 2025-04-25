@@ -1335,13 +1335,13 @@ class Dmailer implements LoggerAwareInterface
                 if (substr($tag, 0, 1) === '"' && $removeQuotes) {
                     // Quotes around the value
                     $reg = explode('"', substr($tag, 1, $tagLen), 2);
-                    $tag = ltrim($reg[1]);
-                    $value = $reg[0];
+                    $tag = ltrim($reg[1] ?? '');
+                    $value = $reg[0] ?? '';
                 } else {
                     // No quotes around value
                     preg_match('/^([^[:space:]>]*)(.*)/', $tag, $reg);
-                    $value = trim($reg[1]);
-                    $tag = ltrim($reg[2]);
+                    $value = trim($reg[1] ?? '');
+                    $tag = ltrim($reg[2] ?? '');
                     if (substr($tag, 0, 1) === '>') {
                         $tag = '';
                     }

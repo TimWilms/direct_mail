@@ -27,6 +27,8 @@ use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
 use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Resource\FileRepository;
+use TYPO3\CMS\Core\Routing\PageRouter;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
@@ -94,14 +96,14 @@ class DirectMailUtility
         bool $forceAbsoluteUrl = true,
         bool $linkAccessRestrictedPages = true
     ): string {
-        $typolinkPageUrl = 't3://page?uid=';
-        $cObj = GeneralUtility::makeInstance(ContentObjectRenderer::class);
-
-        return $cObj->typolink_URL([
-            'parameter' => $typolinkPageUrl . $parameter,
-            'forceAbsoluteUrl' => $forceAbsoluteUrl,
-            'linkAccessRestrictedPages' => $linkAccessRestrictedPages,
-        ]);
+        $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        $site = $siteFinder->getSiteByPageId((int)$parameter);
+        $pageRouter = GeneralUtility::makeInstance(PageRouter::class, $site);
+        $parameters = [];
+        if (strpos($parameter, '&') !== false) {
+            parse_str(substr($parameter, strpos($parameter, '&') + 1), $parameters);
+        }
+        return (string)$pageRouter->generateUri((int)$parameter, $parameters);
     }
 
     /**
